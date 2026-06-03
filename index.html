@@ -580,7 +580,9 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: .5; cursor: poi
   width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer;
   background: var(--ws-blue); color: #fff; font-size: 20px;
   box-shadow: 0 4px 16px rgba(0,51,102,.45); transition: all .2s;
+  display: none; /* hidden by default — shown only via ?admin=true */
 }
+.admin-fab.visible { display: flex; align-items: center; justify-content: center; }
 .admin-fab:hover { background: var(--ws-mid); transform: scale(1.06); }
 
 .admin-panel {
@@ -968,7 +970,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: .5; cursor: poi
 </div>
 
 <!-- ADMIN FAB -->
-<button class="admin-fab" onclick="toggleAdmin()" title="Painel Administrativo">⚙️</button>
+<button class="admin-fab" id="adminFab" onclick="toggleAdmin()" title="Painel Administrativo">⚙️</button>
 
 <!-- ADMIN PANEL -->
 <div class="admin-panel" id="adminPanel">
@@ -1030,6 +1032,17 @@ window.addEventListener('DOMContentLoaded', () => {
   if (S.cfg.email)  document.getElementById('cfgEmail').value  = S.cfg.email;
   refreshAdmin();
   buildScriptCode();
+
+  // ── ADMIN ACCESS: only visible via ?admin=true in URL ──
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('admin') === 'true') {
+    document.getElementById('adminFab').classList.add('visible');
+    // Clean the URL so the param doesn't stay visible
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+    // Auto-open the panel
+    document.getElementById('adminPanel').classList.add('open');
+  }
 });
 
 // ── MASKS ────────────────────────────────────────────
